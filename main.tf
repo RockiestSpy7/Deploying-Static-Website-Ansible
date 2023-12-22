@@ -75,3 +75,13 @@ module "application_load_balancer" {
   vpc_id                = module.vpc.vpc_id
   certificate_arn       = module.ssl_certificate.certificate_arn
 }
+
+# create record set in route-53 module
+module "route_53" {
+  source = "git@github.com:RockiestSpy7/terraform-modules.git//route-53"
+  # route 53 variables
+  domain_name                        = module.ssl_certificate.domain_name
+  record_name                        = var.record_name
+  application_load_balancer_dns_name = module.application_load_balancer.application_load_balancer_dns_name
+  application_load_balancer_zone_id  = module.application_load_balancer.application_load_balancer_zone_id
+}

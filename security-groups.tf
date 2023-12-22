@@ -60,6 +60,33 @@ resource "aws_security_group" "ssh_security_group" {
   }
 }
 
+# create security group for the ansible server
+# terraform aws create security group
+resource "aws_security_group" "ansible_security_group" {
+  name        = "ansible security group"
+  description = "enable ssh access on port 22 via ssh sg"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description      = "ssh access"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.ssh_security_group.id]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = -1
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  tags   = {
+    Name = "ansible security group"
+  }
+}
+
 # create security group for the web server
 # terraform aws create security group
 resource "aws_security_group" "webserver_security_group" {
@@ -100,32 +127,5 @@ resource "aws_security_group" "webserver_security_group" {
 
   tags   = {
     Name = "webserver security group"
-  }
-}
-
-# create security group for the bastion host aka jump box
-# terraform aws create security group
-resource "aws_security_group" "ansible_security_group" {
-  name        = "ansible security group"
-  description = "enable ssh access on port 22"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description      = "ssh access"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.ssh_security_group.id]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = -1
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  tags   = {
-    Name = "ssh security group"
   }
 }
